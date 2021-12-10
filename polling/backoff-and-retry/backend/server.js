@@ -8,9 +8,9 @@ const msg = new nanobuffer(50);
 const getMsgs = () => Array.from(msg).reverse();
 
 msg.push({
-  user: "brian",
-  text: "hi",
-  time: Date.now(),
+    user: "brian",
+    text: "hi",
+    time: Date.now(),
 });
 
 app.use(morgan("dev"));
@@ -18,26 +18,28 @@ app.use(bodyParser.json());
 app.use(express.static("frontend"));
 
 app.get("/poll", function (req, res) {
-  // this intenitonally causes failures
-  res.status(Math.random() > 0.5 ? 200 : 500).json({
-    msg: getMsgs(),
-  });
+    // this intenitonally causes failures
+    res.status(Math.random() > 0.5 ? 200 : 500).json({
+        msg: getMsgs(),
+    });
 });
 
 app.post("/poll", function (req, res) {
-  const { user, text } = req.body;
+    const { user, text } = req.body;
 
-  msg.push({
-    user,
-    text,
-    time: Date.now(),
-  });
+    msg.push({
+        user,
+        text,
+        time: Date.now(),
+    });
 
-  res.json({
-    status: "ok",
-  });
+    res.json({
+        status: "ok",
+    });
 });
 
 const port = process.env.PORT || 3000;
+
 app.listen(port);
+
 console.log(`listening on http://localhost:${port}`);
