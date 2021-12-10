@@ -23,7 +23,7 @@ app.use(express.static("frontend"));
 app.get("/poll", function (req, res) {
     // use getMsgs to get messages to send back
     res.header("Content-type", "application/json");
-    res.json({
+    res.status(Math.random() >= 0.5 ? 200 : 500).json({
         messages: getMsgs(),
     });
 });
