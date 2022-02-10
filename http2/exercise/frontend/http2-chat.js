@@ -32,11 +32,46 @@ async function postNewMsg(user, text) {
 }
 
 async function getNewMsgs() {
-  /*
-   *
-   * code goes here
-   *
-   */
+  let reader;
+  const UTF8Decoder = new TextDecoder('utf-8');
+  
+  try {
+    const response = await fetch('/msgs');
+    reader = response.body.getReader();
+  } catch (error) {
+    console.log(error);
+  }
+  
+  presence.innerText = '🟢';
+  
+  let done;
+  
+  do {
+    let readerResponse;
+  
+    try {
+        readerResponse = await reader.read();
+      } catch (error) {
+        console.log(error);
+        presence.innerText = '🔴';
+        return;
+      }
+    
+      const chunk = UTF8Decoder.decode(readerResponse.value, { string: true});
+      done = readerResponse.done;
+    
+      if (chunk) {
+        try {
+          const json = JSON.parse(chunk);
+          allChat = json.msg;
+          render();
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    
+  } while (!done);
+  presence.innerText = '🔴';
 }
 
 function render() {
@@ -46,7 +81,8 @@ function render() {
   msgs.innerHTML = html.join("\n");
 }
 
-const template = (user, msg) =>
-  `<li class="collection-item"><span class="badge">${user}</span>${msg}</li>`;
+const template = (user, msg) => {
+  return `<li class="collection-item"><span class="badge">${user}</span>${msg}</li>`;
+}
 
 getNewMsgs();
