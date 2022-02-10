@@ -19,13 +19,30 @@ const server = http.createServer((request, response) => {
   });
 });
 
-/*
- *
- * Code goes here
- *
- */
+const socketServer = new Server(server, {});
 
-const port = process.env.PORT || 8080;
+socketServer.on('connect', (socket) => {
+  console.log("Socket connected: " + socket.id);
+  
+  socket.emit('message.get', { msg: getMsgs() });
+  
+  socket.on('message.post', (data) => {
+    msg.push({
+      text: data.text,
+      user: data.user,
+      time: Date.now(),
+    });
+    
+    socketServer.emit('message.get', { msg: getMsgs() });
+  });
+});
+
+socketServer.on('disconnect', (socket) => {
+  console.log("Socket disconnected: " + socket.id);
+});
+
+const port = process.env.PORT || 40001;
+
 server.listen(port, () =>
   console.log(`Server running at http://localhost:${port}`)
 );
